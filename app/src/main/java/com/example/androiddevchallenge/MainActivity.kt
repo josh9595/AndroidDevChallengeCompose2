@@ -20,18 +20,19 @@ import android.os.Handler
 import android.os.Looper
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -71,6 +72,7 @@ fun MyApp(countdownViewModel: CountdownViewModel = CountdownViewModel()) {
         Bar(
             progress = calcProgress(timerMinute, timerOneSecond, timerTwoSecond)
         )
+
         Column(modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()) {
@@ -86,71 +88,135 @@ fun MyApp(countdownViewModel: CountdownViewModel = CountdownViewModel()) {
                     Row(modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center) {
 
-                        Column {
-                            Button(onClick = { countdownViewModel.minuteUp() }, enabled = isStartButtonEnabled(countdownState)) {
-                                Text(
-                                    text = "▲",
-                                    style = MaterialTheme.typography.h4
-                                )
+                        var cacheMinute by remember { mutableStateOf(0) }
+                        var cacheOneSecond by remember { mutableStateOf(0) }
+                        var cacheTwoSecond by remember { mutableStateOf(0) }
+
+                        val alphaMinute by animateFloatAsState(
+                            if (cacheMinute == timerMinute) 1f else 0.4f,
+                            finishedListener = {
+                                cacheMinute = timerMinute
                             }
+                        )
+                        val alphaOneSecond by animateFloatAsState(
+                            if (cacheOneSecond == timerOneSecond) 1f else 0.4f,
+                            finishedListener = {
+                                cacheOneSecond = timerOneSecond
+                            }
+                        )
+
+                        val alphaTwoSecond by animateFloatAsState(
+                            if (cacheTwoSecond == timerTwoSecond) 1f else 0.4f,
+                            finishedListener = {
+                                cacheTwoSecond = timerTwoSecond
+                            }
+                        )
+
+                        Column {
+                            IconButton(
+                                onClick = { countdownViewModel.minuteUp() },
+                                enabled = isStartButtonEnabled(countdownState),
+                                modifier = Modifier.offset(x = 8.dp, y = 0.dp)) {
+                                if (isStartButtonEnabled(countdownState)) {
+                                    Icon(
+                                        Icons.Default.KeyboardArrowUp,
+                                        contentDescription = "Plus 1 minute"
+                                    )
+                                }
+                            }
+
                             Text(
                                 text = "$timerMinute",
-                                modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                                modifier = Modifier
+                                    .padding(start = 8.dp, end = 8.dp)
+                                    .animateContentSize()
+                                    .alpha(alphaMinute),
                                 style = MaterialTheme.typography.h1
                             )
-                            Button(onClick = { countdownViewModel.minuteDown() }, enabled = isStartButtonEnabled(countdownState)) {
-                                Text(
-                                    text = "▼",
-                                    style = MaterialTheme.typography.h4
-                                )
+                            IconButton(
+                                onClick = { countdownViewModel.minuteDown() },
+                                enabled = isStartButtonEnabled(countdownState),
+                                modifier = Modifier.offset(x = 8.dp, y = 0.dp)) {
+                                if (isStartButtonEnabled(countdownState)) {
+                                    Icon(
+                                        Icons.Default.KeyboardArrowDown,
+                                        contentDescription = "Minus 1 minute"
+                                    )
+                                }
                             }
                         }
 
                         Column {
                             Text(
                                 text = ":",
-                                modifier = Modifier.padding(top = 56.dp),
+                                modifier = Modifier.padding(top = 40.dp),
                                 style = MaterialTheme.typography.h1
                             )
                         }
 
                         Column {
-                            Button(onClick = { countdownViewModel.oneSecondUp() }, enabled = isStartButtonEnabled(countdownState)) {
-                                Text(
-                                    text = "▲",
-                                    style = MaterialTheme.typography.h4
-                                )
+                            IconButton(
+                                onClick = { countdownViewModel.oneSecondUp() },
+                                enabled = isStartButtonEnabled(countdownState),
+                                modifier = Modifier.offset(x = 8.dp, y = 0.dp)) {
+                                if (isStartButtonEnabled(countdownState)) {
+                                    Icon(
+                                        Icons.Default.KeyboardArrowUp,
+                                        contentDescription = "Plus 10 seconds"
+                                    )
+                                }
                             }
                             Text(
                                 text = "$timerOneSecond",
-                                modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                                modifier = Modifier
+                                    .padding(start = 8.dp, end = 8.dp)
+                                    .animateContentSize()
+                                    .alpha(alphaOneSecond),
                                 style = MaterialTheme.typography.h1
                             )
-                            Button(onClick = { countdownViewModel.oneSecondDown() }, enabled = isStartButtonEnabled(countdownState)) {
-                                Text(
-                                    text = "▼",
-                                    style = MaterialTheme.typography.h4
-                                )
+                            IconButton(
+                                onClick = { countdownViewModel.oneSecondDown() },
+                                enabled = isStartButtonEnabled(countdownState),
+                                modifier = Modifier.offset(x = 8.dp, y = 0.dp)) {
+                                if (isStartButtonEnabled(countdownState)) {
+                                    Icon(
+                                        Icons.Default.KeyboardArrowDown,
+                                        contentDescription = "Minus 10 seconds"
+                                    )
+                                }
                             }
                         }
 
                         Column {
-                            Button(onClick = { countdownViewModel.twoSecondUp() }, enabled = isStartButtonEnabled(countdownState)) {
-                                Text(
-                                    text = "▲",
-                                    style = MaterialTheme.typography.h4
-                                )
+                            IconButton(
+                                onClick = { countdownViewModel.twoSecondUp() },
+                                enabled = isStartButtonEnabled(countdownState),
+                                modifier = Modifier.offset(x = 8.dp, y = 0.dp)) {
+                                if (isStartButtonEnabled(countdownState)) {
+                                    Icon(
+                                        Icons.Default.KeyboardArrowUp,
+                                        contentDescription = "Plus one second"
+                                    )
+                                }
                             }
                             Text(
                                 text = "$timerTwoSecond",
-                                modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                                modifier = Modifier
+                                    .padding(start = 8.dp, end = 8.dp)
+                                    .animateContentSize()
+                                    .alpha(alphaTwoSecond),
                                 style = MaterialTheme.typography.h1
                             )
-                            Button(onClick = { countdownViewModel.twoSecondDown() }, enabled = isStartButtonEnabled(countdownState)) {
-                                Text(
-                                    text = "▼",
-                                    style = MaterialTheme.typography.h4
-                                )
+                            IconButton(
+                                onClick = { countdownViewModel.twoSecondDown() },
+                                enabled = isStartButtonEnabled(countdownState),
+                                modifier = Modifier.offset(x = 8.dp, y = 0.dp)) {
+                                if (isStartButtonEnabled(countdownState)) {
+                                    Icon(
+                                        Icons.Default.KeyboardArrowDown,
+                                        contentDescription = "Minus 1 second"
+                                    )
+                                }
                             }
                         }
                     }
@@ -161,7 +227,9 @@ fun MyApp(countdownViewModel: CountdownViewModel = CountdownViewModel()) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center) {
                         Button(
-                            onClick = { countdownViewModel.startTimer() },
+                            onClick = { if (timerMinute != 0 || timerOneSecond != 0 || timerTwoSecond != 0 ) {
+                                countdownViewModel.startTimer()}
+                            },
                             enabled = isStartButtonEnabled(countdownState)
                         ) {
                             Text(text = "Start")
@@ -198,14 +266,14 @@ fun Bar(
 ) {
     val path = remember { Path() }.apply { reset() }
     Canvas(modifier = Modifier.fillMaxSize()) {
-        val topOffset = (size.height + 32f) * (1f - progress)
+        val topOffset = size.height * (1f - progress)
 
         path.reset()
         path.moveTo(0f, topOffset)
         path.lineTo(size.width, topOffset)
 
         drawRect(color, topLeft = Offset(0f, topOffset), alpha = 0.5f)
-        drawRect(color, topLeft = Offset(0f, topOffset), alpha = 0.3f)
+//        drawRect(color, topLeft = Offset(0f, topOffset), alpha = 0.3f)
         drawPath(path, color, alpha = 0.5f)
     }
 }
