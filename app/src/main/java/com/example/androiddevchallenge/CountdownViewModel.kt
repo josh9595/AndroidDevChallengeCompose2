@@ -21,7 +21,7 @@ class CountdownViewModel : ViewModel() {
 
     fun minuteUp() {
         _timerMinute.value?.let {
-            if (it == 9) {
+            if (it == 4) {
                 _timerMinute.value = 0
             } else {
                 _timerMinute.value = it + 1
@@ -32,7 +32,7 @@ class CountdownViewModel : ViewModel() {
     fun minuteDown() {
         _timerMinute.value?.let {
             if (it == 0) {
-                _timerMinute.value = 9
+                _timerMinute.value = 4
             } else {
                 _timerMinute.value = it - 1
             }
